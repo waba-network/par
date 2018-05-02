@@ -1,0 +1,10 @@
+file(GLOB ABI_FILES "*.abi")
+configure_file("${ABI_FILES}" "${CMAKE_CURRENT_BINARY_DIR}" COPYONLY)
+
+get_property(INCLUDE_DIRECTORIES DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+
+add_wast_executable(TARGET waba.token.backend
+        INCLUDE_FOLDERS "${INCLUDE_DIRECTORIES}"
+        LIBRARIES libc++ eosiolib
+        DESTINATION_FOLDER ${CMAKE_CURRENT_BINARY_DIR}
+        )
