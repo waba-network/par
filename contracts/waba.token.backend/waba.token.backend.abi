@@ -1,82 +1,173 @@
 {
   "types": [],
-  "structs": [{
+  "structs": [
+    {
       "name": "transfer",
       "base": "",
       "fields": [
-        {"name":"from", "type":"account_name"},
-        {"name":"to", "type":"account_name"},
-        {"name":"quantity", "type":"asset"},
-        {"name":"memo", "type":"string"}
+        {
+          "name": "from",
+          "type": "account_name"
+        },
+        {
+          "name": "to",
+          "type": "account_name"
+        },
+        {
+          "name": "quantity",
+          "type": "asset"
+        },
+        {
+          "name": "memo",
+          "type": "string"
+        }
       ]
-    },{
-     "name": "create",
-     "base": "",
-     "fields": [
-        {"name":"issuer", "type":"account_name"},
-        {"name":"maximum_supply", "type":"asset"},
-        {"name":"can_freeze", "type":"uint8"},
-        {"name":"can_recall", "type":"uint8"},
-        {"name":"can_whitelist", "type":"uint8"}
-     ]
-  },{
-     "name": "issue",
-     "base": "",
-     "fields": [
-        {"name":"to", "type":"account_name"},
-        {"name":"quantity", "type":"asset"},
-        {"name":"memo", "type":"string"}
-     ]
-  },{
+    },
+    {
+      "name": "create",
+      "base": "",
+      "fields": [
+        {
+          "name": "issuer",
+          "type": "account_name"
+        },
+        {
+          "name": "symbol_type",
+          "type": "symbol"
+        },
+        {
+          "name": "contract_type",
+          "type": "uint8"
+        },
+        {
+          "name": "contract_settings",
+          "type": "contract_setting[]"
+        }
+      ]
+    },
+    {
+      "name": "issue",
+      "base": "",
+      "fields": [
+        {
+          "name": "to",
+          "type": "account_name"
+        },
+        {
+          "name": "quantity",
+          "type": "asset"
+        },
+        {
+          "name": "memo",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "account",
       "base": "",
       "fields": [
-        {"name":"balance", "type":"asset"},
-        {"name":"frozen", "type":"uint8"},
-        {"name":"whitelist", "type":"uint8"}
+        {
+          "name": "balance",
+          "type": "asset"
+        },
+        {
+          "name": "frozen",
+          "type": "uint8"
+        },
+        {
+          "name": "whitelist",
+          "type": "uint8"
+        }
       ]
-    },{
-      "name": "currency_stats",
+    },
+    {
+      "name": "token_settings",
       "base": "",
       "fields": [
-        {"name":"supply", "type":"asset"},
-        {"name":"max_supply", "type":"asset"},
-        {"name":"issuer", "type":"account_name"},
-        {"name":"can_freeze", "type":"uint8"},
-        {"name":"can_recall", "type":"uint8"},
-        {"name":"can_whitelist", "type":"uint8"},
-        {"name":"is_frozen", "type":"uint8"},
-        {"name":"enforce_whitelist", "type":"uint8"}
+        {
+          "name": "supply",
+          "type": "asset"
+        },
+        {
+          "name": "issuer",
+          "type": "account_name"
+        },
+        {
+          "name": "contract_type",
+          "type": "uint8"
+        }
+      ]
+    },
+    {
+      "name": "contract_setting",
+      "base": "",
+      "fields": [
+        {
+          "name": "key",
+          "type": "uint64"
+        },
+        {
+          "name": "value",
+          "type": "string"
+        }
       ]
     }
   ],
-  "actions": [{
+  "actions": [
+    {
       "name": "transfer",
       "type": "transfer",
       "ricardian_contract": ""
-    },{
+    },
+    {
       "name": "issue",
       "type": "issue",
       "ricardian_contract": ""
-    }, {
+    },
+    {
       "name": "create",
       "type": "create",
       "ricardian_contract": ""
+    },
+    {
+      "name": "configure",
+      "type": "configure"
     }
-
   ],
-  "tables": [{
+  "tables": [
+    {
       "name": "accounts",
       "type": "account",
       "index_type": "i64",
-      "key_names" : ["currency"],
-      "key_types" : ["uint64"]
-    },{
-      "name": "stat",
-      "type": "currency_stats",
+      "key_names": [
+        "currency"
+      ],
+      "key_types": [
+        "uint64"
+      ]
+    },
+    {
+      "name": "token",
+      "type": "token_settings",
       "index_type": "i64",
-      "key_names" : ["currency"],
-      "key_types" : ["uint64"]
+      "key_names": [
+        "currency"
+      ],
+      "key_types": [
+        "uint64"
+      ]
+    },
+    {
+      "name": "contract_settings",
+      "type": "contract_setting",
+      "index_type": "i64",
+      "key_names": [
+        "key"
+      ],
+      "key_types": [
+        "uint64"
+      ]
     }
   ],
   "ricardian_clauses": []
