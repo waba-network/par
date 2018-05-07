@@ -4,12 +4,14 @@
 #include <eosiolib/asset.hpp>
 
 #include <string>
+#include <vector>
 
 #include "token_contract.hpp"
 
 namespace waba {
 
     using std::string;
+    using std::vector;
     using eosio::asset;
     using eosio::symbol_name;
     using eosio::symbol_type;
@@ -40,16 +42,16 @@ namespace waba {
     };
 
     static const mutual_credit_system_contract_setting all_settings[] = {
-        demurrage,
-        interest_rate,
-        credit_limit_initial_self_employed,
-        credit_limit_initial_micro_company,
-        credit_limit_initial_small_company,
-        credit_limit_initial_medium_company,
-        credit_limit_max_self_employed,
-        credit_limit_max_micro_company,
-        credit_limit_max_small_company,
-        credit_limit_max_medium_company
+            demurrage,
+            interest_rate,
+            credit_limit_initial_self_employed,
+            credit_limit_initial_micro_company,
+            credit_limit_initial_small_company,
+            credit_limit_initial_medium_company,
+            credit_limit_max_self_employed,
+            credit_limit_max_micro_company,
+            credit_limit_max_small_company,
+            credit_limit_max_medium_company
     };
 
     class mutual_credit_system_contract : public token_contract {
@@ -57,6 +59,10 @@ namespace waba {
     public:
 
         mutual_credit_system_contract(account_name self) : token_contract(self) {}
+
+        void create(account_name issuer,
+                    eosio::symbol_type symbol,
+                    vector<contract_setting> contract_settings) const;
 
         void issue(account_name to, account_type type, asset quantity, string memo);
 

@@ -2,6 +2,7 @@
 
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
+#include <eosiolib/contract.hpp>
 
 #include <string>
 
@@ -32,6 +33,9 @@ namespace waba {
                     symbol_type symbol,
                     contract_type type,
                     vector<contract_setting> contract_settings);
+
+        void add_manager(symbol_type symbol,
+                    account_name new_manager);
 
         void issue(account_name to, asset quantity, string memo);
 

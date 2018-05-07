@@ -1,5 +1,8 @@
 #pragma once
 
+#include <eosiolib/eosio.hpp>
+#include <eosiolib/asset.hpp>
+
 namespace waba {
 
     enum contract_type : uint8_t {
@@ -15,7 +18,7 @@ namespace waba {
 
     } contract_setting;
 
-    typedef eosio::multi_index<N(contract_settings), contract_setting> contract_settings_table;
+    typedef eosio::multi_index<N(settings), contract_setting> contract_settings_table;
 
     class token_contract : public eosio::contract {
     public:
