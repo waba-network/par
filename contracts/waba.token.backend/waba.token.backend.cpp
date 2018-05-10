@@ -121,7 +121,7 @@ namespace waba {
         sub_balance(from, quantity, token_settings);
         // TODO: in the original token code, the ram payer is the sender,
         // we are changing that to the token owner account here
-        add_balance(to, quantity, token_settings, token_settings.owner);
+        add_balance(to, quantity, token_settings, token_settings.owner, from);
     }
 
     void token::sub_balance(account_name owner, asset value, const token_settings &st) {
@@ -139,12 +139,13 @@ namespace waba {
         });
     }
 
-    void token::add_balance(account_name owner, asset value, const token_settings &st, account_name ram_payer) {
+    void token::add_balance(account_name owner, asset value, const token_settings &st, account_name ram_payer, account_name referrer) {
         accounts_table to_acnts(_self, owner);
         auto to = to_acnts.find(value.symbol.name());
         if (to == to_acnts.end()) {
             to_acnts.emplace(ram_payer, [&](auto &a) {
                 a.balance = value;
+                a.referrer = referrer;
             });
         } else {
             to_acnts.modify(to, 0, [&](auto &a) {

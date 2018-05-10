@@ -56,8 +56,7 @@ namespace waba {
 
         void sub_balance(account_name owner, asset value, const token_settings &st);
 
-        void add_balance(account_name owner, asset value, const token_settings &st,
-                         account_name ram_payer);
+        void add_balance(account_name owner, asset value, const token_settings &st, account_name ram_payer, account_name referrer);
 
     public:
         struct transfer_args {
