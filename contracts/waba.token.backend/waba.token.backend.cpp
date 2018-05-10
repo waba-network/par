@@ -9,10 +9,10 @@ namespace waba {
 
     using eosio::print;
 
-    void token::create(account_name issuer,
+    void token::create(account_name owner,
                        symbol_type symbol,
                        contract_type type,
-                       vector<contract_setting> contract_settings) {
+                       vector<setting> contract_settings) {
         require_auth(_self);
 
         eosio_assert(symbol.is_valid(), "invalid symbol name");
@@ -21,39 +21,85 @@ namespace waba {
         auto existing = token_settings_table.find(symbol.name());
         eosio_assert(existing == token_settings_table.end(), "token with symbol already exists");
 
-        token_settings_table.emplace(_self, [&](token_settings &token_settings) {
-            token_settings.supply.symbol = symbol;
-            token_settings.issuer = issuer;
-            token_settings.contract_type = type;
-        });
-
         const token_contract &token_contract = this->get_contract(type);
 
-        token_contract.create(issuer, symbol, contract_settings);
+        token_contract.validate_create(owner, symbol, contract_settings);
+
+        token_settings_table.emplace(_self, [&](token_settings &token_settings) {
+            token_settings.supply.symbol = symbol;
+            token_settings.owner = owner;
+            token_settings.contract_type = type;
+            token_settings.contract_settings = contract_settings;
+        });
+
+        // initialize the owner account
+        accounts_table issuer_accounts(_self, owner);
+        issuer_accounts.emplace(owner, [&](auto &issuer) {
+            issuer.balance = asset(0, symbol);
+            issuer.issue_limit = asset::max_amount;
+        });
+
+        token_contract.initialize(owner, symbol, contract_settings);
 
     }
 
 
     void token::issue(account_name to, asset quantity, string memo) {
         print("issue");
-        auto sym = quantity.symbol.name();
-        token_settings_table token_settings_table(_self, sym);
-        const auto &token_settings = token_settings_table.get(sym);
 
-        require_auth(token_settings.issuer);
         eosio_assert(quantity.is_valid(), "invalid quantity");
         eosio_assert(quantity.amount > 0, "must issue positive quantity");
+
+        auto symbol = quantity.symbol.name();
+        token_settings_table token_settings_table(_self, symbol);
+        const token_settings &token_settings = token_settings_table.get(symbol);
+
+        accounts_table issuer_accounts(_self, current_sender());
+        const account& issuer = issuer_accounts.get(symbol);
+        asset issued = asset(issuer.issued, symbol);
+        asset limit = asset(issuer.issue_limit, symbol);
+
+        eosio_assert(issued + quantity > limit, "specified quantity exceeds your issue limit");
 
         token_settings_table.modify(token_settings, 0, [&](auto &token_settings) {
             token_settings.supply += quantity;
         });
 
-        add_balance(token_settings.issuer, quantity, token_settings, token_settings.issuer);
+        const token_contract &token_contract = this->get_contract(token_settings.contract_type);
 
-        if (to != token_settings.issuer) {
-            SEND_INLINE_ACTION(*this, transfer, { token_settings.issuer, N(active) },
-                               { token_settings.issuer, to, quantity, memo });
+        issuer_accounts.modify(issuer, 0, [&](auto &issuer) {
+            issuer.issued = (issued + quantity).amount;
+            issuer.balance += quantity;
+        });
+
+        if (to != current_sender()) {
+            SEND_INLINE_ACTION(*this, transfer, { current_sender(), N(active) },
+                               { current_sender(), to, quantity, memo });
         }
+
+        token_contract.issue(to, quantity);
+
+    }
+
+    void token::setissuelimit(account_name to, asset limit, string memo) {
+        print("setissuelimit");
+
+        auto sym = limit.symbol.name();
+        token_settings_table token_settings_table(_self, sym);
+        const auto &token_settings = token_settings_table.get(sym);
+
+        // TODO: can only the managers allow issuing?
+        require_auth(token_settings.owner);
+
+        accounts_table receiver_accounts(_self, to);
+        const account &receiver = receiver_accounts.get(limit.symbol.name());
+
+        eosio_assert(receiver.issued > limit.amount, "already issued more than the new limit");
+
+        receiver_accounts.modify(receiver, 0, [&](account &updatable_receiver) {
+            updatable_receiver.issue_limit = limit.amount;
+        });
+
     }
 
     void token::transfer(account_name from,
@@ -73,11 +119,13 @@ namespace waba {
         eosio_assert(quantity.amount > 0, "must transfer positive quantity");
 
         sub_balance(from, quantity, token_settings);
-        add_balance(to, quantity, token_settings, from);
+        // TODO: in the original token code, the ram payer is the sender,
+        // we are changing that to the token owner account here
+        add_balance(to, quantity, token_settings, token_settings.owner);
     }
 
     void token::sub_balance(account_name owner, asset value, const token_settings &st) {
-        accounts from_acnts(_self, owner);
+        accounts_table from_acnts(_self, owner);
 
         const auto &from = from_acnts.get(value.symbol.name());
         eosio_assert(from.balance.amount >= value.amount, "overdrawn balance");
@@ -92,7 +140,7 @@ namespace waba {
     }
 
     void token::add_balance(account_name owner, asset value, const token_settings &st, account_name ram_payer) {
-        accounts to_acnts(_self, owner);
+        accounts_table to_acnts(_self, owner);
         auto to = to_acnts.find(value.symbol.name());
         if (to == to_acnts.end()) {
             to_acnts.emplace(ram_payer, [&](auto &a) {
@@ -105,7 +153,7 @@ namespace waba {
         }
     }
 
-    token_contract token::get_contract(contract_type type) {
+    const token_contract& token::get_contract(contract_type type) {
 
         switch (type) {
             case mutual_credit_system:
@@ -121,4 +169,4 @@ namespace waba {
 
 } /// namespace eosio
 
-EOSIO_ABI(waba::token, (create)(issue)(transfer))
+EOSIO_ABI(waba::token, (create)(issue)(setissuelimit)(transfer))

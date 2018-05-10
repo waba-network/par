@@ -19,8 +19,9 @@ namespace waba {
 
     typedef struct token_settings {
         asset supply;
-        account_name issuer;
+        account_name owner;
         contract_type contract_type;
+        vector<setting> contract_settings;
 
         uint64_t primary_key() const { return supply.symbol.name(); }
     } token_settings;
@@ -29,15 +30,14 @@ namespace waba {
     public:
         token(account_name self) : contract(self) {}
 
-        void create(account_name issuer,
+        void create(account_name owner,
                     symbol_type symbol,
                     contract_type type,
-                    vector<contract_setting> contract_settings);
-
-        void add_manager(symbol_type symbol,
-                    account_name new_manager);
+                    vector<setting> contract_settings);
 
         void issue(account_name to, asset quantity, string memo);
+
+        void setissuelimit(account_name to, asset limit, string memo);
 
         void transfer(account_name from,
                       account_name to,
@@ -51,16 +51,7 @@ namespace waba {
         inline asset get_balance(account_name owner, symbol_name sym) const;
 
     private:
-        struct account {
-            asset balance;
-            bool frozen = false;
-            bool whitelist = true;
 
-            uint64_t primary_key() const { return balance.symbol.name(); }
-        };
-
-
-        typedef eosio::multi_index<N(accounts), account> accounts;
         typedef eosio::multi_index<N(token), token_settings> token_settings_table;
 
         void sub_balance(account_name owner, asset value, const token_settings &st);
@@ -76,7 +67,7 @@ namespace waba {
             string memo;
         };
 
-        token_contract get_contract(contract_type type);
+        const token_contract& get_contract(contract_type type);
     };
 
     asset token::get_supply(symbol_name sym) const {
@@ -86,7 +77,7 @@ namespace waba {
     }
 
     asset token::get_balance(account_name owner, symbol_name sym) const {
-        accounts accountstable(_self, owner);
+        accounts_table accountstable(_self, owner);
         const auto &ac = accountstable.get(sym);
         return ac.balance;
     }

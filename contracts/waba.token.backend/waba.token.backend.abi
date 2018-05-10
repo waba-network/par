@@ -28,7 +28,7 @@
       "base": "",
       "fields": [
         {
-          "name": "issuer",
+          "name": "owner",
           "type": "account_name"
         },
         {
@@ -41,7 +41,7 @@
         },
         {
           "name": "contract_settings",
-          "type": "contract_setting[]"
+          "type": "setting[]"
         }
       ]
     },
@@ -64,6 +64,23 @@
       ]
     },
     {
+      "name": "setissuelimit",
+      "base": "",
+      "fields": [
+        {
+          "name": "to",
+          "type": "account_name"
+        },
+        {
+          "name": "limit",
+          "type": "asset"
+        },
+        {
+          "name": "memo",
+          "type": "string"
+        }
+      ]
+    },    {
       "name": "account",
       "base": "",
       "fields": [
@@ -72,12 +89,24 @@
           "type": "asset"
         },
         {
-          "name": "frozen",
-          "type": "uint8"
+          "name": "overdraft",
+          "type": "int64"
         },
         {
-          "name": "whitelist",
-          "type": "uint8"
+          "name": "issue_limit",
+          "type": "int64"
+        },
+        {
+          "name": "issued",
+          "type": "int64"
+        },
+        {
+          "name": "referrer",
+          "type": "account_name"
+        },
+        {
+          "name": "settings",
+          "type": "setting[]"
         }
       ]
     },
@@ -90,17 +119,18 @@
           "type": "asset"
         },
         {
-          "name": "issuer",
+          "name": "owner",
           "type": "account_name"
         },
         {
           "name": "contract_type",
           "type": "uint8"
-        }
+        },
+
       ]
     },
     {
-      "name": "contract_setting",
+      "name": "setting",
       "base": "",
       "fields": [
         {
@@ -109,7 +139,7 @@
         },
         {
           "name": "value",
-          "type": "string"
+          "type": "int64"
         }
       ]
     }
@@ -131,8 +161,8 @@
       "ricardian_contract": ""
     },
     {
-      "name": "configure",
-      "type": "configure"
+      "name": "setissuelimit",
+      "type": "setissuelimit"
     }
   ],
   "tables": [
@@ -153,17 +183,6 @@
       "index_type": "i64",
       "key_names": [
         "currency"
-      ],
-      "key_types": [
-        "uint64"
-      ]
-    },
-    {
-      "name": "contract_settings",
-      "type": "contract_setting",
-      "index_type": "i64",
-      "key_names": [
-        "key"
       ],
       "key_types": [
         "uint64"

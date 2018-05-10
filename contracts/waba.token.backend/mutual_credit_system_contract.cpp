@@ -7,14 +7,12 @@ namespace waba {
 
     using std::vector;
 
-    void mutual_credit_system_contract::create(account_name issuer,
+    void mutual_credit_system_contract::validate_create(account_name issuer,
                                                eosio::symbol_type symbol,
-                                               vector<contract_setting> contract_settings) const {
-
-        contract_settings_table contract_settings_table(_self, issuer);
+                                               vector<setting> contract_settings) const {
 
         // TODO validate individual values
-        for (contract_setting &contract_setting : contract_settings) {
+        for (setting &contract_setting : contract_settings) {
             bool found = false;
             for (const auto key : all_settings) {
                 if (contract_setting.key == key) {
@@ -24,13 +22,21 @@ namespace waba {
             }
 
             eosio_assert(found, "invalid contract setting key");
-
-            contract_settings_table.emplace(contract_setting.key, [&](waba::contract_setting &to_update) {
-                to_update.key = contract_setting.key;
-                to_update.value = contract_setting.value;
-            });
-
         }
+    }
+
+    void mutual_credit_system_contract::initialize(account_name issuer,
+                                                   eosio::symbol_type symbol,
+                                                   vector<setting> contract_settings) const {
+        // default impl is good enough for us
+    }
+
+    void mutual_credit_system_contract::issue(account_name to, asset quantity) const {
+        symbol_type symbol = quantity.symbol;
+        accounts_table issuer_accounts(_self, current_sender());
+        issuer_accounts.modify(issuer_accounts.get(symbol), 0, [&](auto &to_update) {
+            to_update.overdraft = (asset(to_update.overdraft, symbol) + quantity).amount;
+        });
     }
 
 }/// namespace eosio
