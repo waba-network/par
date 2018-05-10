@@ -89,6 +89,10 @@
           "type": "asset"
         },
         {
+          "name": "frozen",
+          "type": "bool"
+        },
+        {
           "name": "overdraft",
           "type": "int64"
         },

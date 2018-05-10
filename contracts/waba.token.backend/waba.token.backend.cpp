@@ -59,6 +59,7 @@ namespace waba {
         asset issued = asset(issuer.issued, symbol);
         asset limit = asset(issuer.issue_limit, symbol);
 
+        eosio_assert( !issuer.frozen, "issuer is frozen" );
         eosio_assert(issued + quantity > limit, "specified quantity exceeds your issue limit");
 
         token_settings_table.modify(token_settings, 0, [&](auto &token_settings) {
@@ -127,8 +128,10 @@ namespace waba {
     void token::sub_balance(account_name owner, asset value, const token_settings &st) {
         accounts_table from_acnts(_self, owner);
 
-        const auto &from = from_acnts.get(value.symbol.name());
+        const account &from = from_acnts.get(value.symbol.name());
         eosio_assert(from.balance.amount >= value.amount, "overdrawn balance");
+
+        eosio_assert( !from.frozen, "sender is frozen" );
 
         if (!has_auth(owner)) {
             eosio_assert(false, "insufficient authority");

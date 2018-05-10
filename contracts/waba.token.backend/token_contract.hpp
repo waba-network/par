@@ -22,6 +22,7 @@ namespace waba {
 
     struct account {
         asset balance;
+        bool frozen = false;
         int64_t overdraft = 0;
         int64_t issue_limit = 0;
         int64_t issued = 0;
