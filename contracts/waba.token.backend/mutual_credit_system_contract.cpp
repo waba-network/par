@@ -8,8 +8,8 @@ namespace waba {
     using std::vector;
 
     void mutual_credit_system_contract::validate_create(account_name issuer,
-                                               eosio::symbol_type symbol,
-                                               vector<setting> contract_settings) const {
+                                                        eosio::symbol_type symbol,
+                                                        vector<setting> contract_settings) const {
 
         // TODO validate individual values
         for (setting &contract_setting : contract_settings) {
@@ -31,7 +31,7 @@ namespace waba {
         // default impl is good enough for us
     }
 
-    void mutual_credit_system_contract::issue(account_name to, asset quantity) const {
+    void mutual_credit_system_contract::issue(account_name to, asset quantity, std::vector<setting> settings) const {
         symbol_type symbol = quantity.symbol;
         accounts_table issuer_accounts(_self, current_sender());
         issuer_accounts.modify(issuer_accounts.get(symbol), 0, [&](auto &to_update) {

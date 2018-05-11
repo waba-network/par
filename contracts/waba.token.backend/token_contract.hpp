@@ -39,14 +39,14 @@ namespace waba {
         token_contract(account_name self) : contract(self) {}
 
         virtual void validate_create(account_name issuer,
-                            eosio::symbol_type symbol,
-                            std::vector<setting> contract_settings) const = 0;
-
-        virtual void initialize(account_name issuer,
                                      eosio::symbol_type symbol,
                                      std::vector<setting> contract_settings) const = 0;
 
-        virtual void issue(account_name to, asset quantity) const = 0;
+        virtual void initialize(account_name issuer,
+                                eosio::symbol_type symbol,
+                                std::vector<setting> contract_settings) const = 0;
+
+        virtual void issue(account_name to, asset quantity, std::vector<setting> settings) const = 0;
 
     };
 

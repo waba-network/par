@@ -35,9 +35,9 @@ namespace waba {
                     contract_type type,
                     vector<setting> contract_settings);
 
-        void issue(account_name to, asset quantity, string memo);
+        void issue(account_name to, asset quantity, vector<setting> settings, string memo);
 
-        void setissuelimit(account_name to, asset limit, string memo);
+        void setissuelimit(account_name to, asset limit, vector<setting> settings, string memo);
 
         void transfer(account_name from,
                       account_name to,

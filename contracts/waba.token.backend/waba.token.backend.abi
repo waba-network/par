@@ -58,6 +58,9 @@
           "type": "asset"
         },
         {
+          "name": "settings",
+          "type": "setting[]"
+        }, {
           "name": "memo",
           "type": "string"
         }
@@ -76,6 +79,9 @@
           "type": "asset"
         },
         {
+          "name": "settings",
+          "type": "setting[]"
+        }, {
           "name": "memo",
           "type": "string"
         }

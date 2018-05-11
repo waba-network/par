@@ -44,7 +44,7 @@ namespace waba {
     }
 
 
-    void token::issue(account_name to, asset quantity, string memo) {
+    void token::issue(account_name to, asset quantity, std::vector<setting> settings, string memo) {
         print("issue");
 
         eosio_assert(quantity.is_valid(), "invalid quantity");
@@ -78,11 +78,11 @@ namespace waba {
                                { current_sender(), to, quantity, memo });
         }
 
-        token_contract.issue(to, quantity);
+        token_contract.issue(to, quantity, settings);
 
     }
 
-    void token::setissuelimit(account_name to, asset limit, string memo) {
+    void token::setissuelimit(account_name to, asset limit, std::vector<setting> settings, string memo) {
         print("setissuelimit");
 
         auto sym = limit.symbol.name();
