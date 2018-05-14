@@ -44,7 +44,7 @@ namespace waba {
     }
 
 
-    void token::issue(account_name to, asset quantity, std::vector<setting> settings, string memo) {
+    void token::issue(account_name from, account_name to, asset quantity, std::vector<setting> settings, string memo) {
         print("issue");
 
         eosio_assert(quantity.is_valid(), "invalid quantity");
@@ -54,7 +54,7 @@ namespace waba {
         token_settings_table token_settings_table(_self, symbol);
         const token_settings &token_settings = token_settings_table.get(symbol);
 
-        accounts_table issuer_accounts(_self, current_sender());
+        accounts_table issuer_accounts(_self, from);
         const account& issuer = issuer_accounts.get(symbol);
         asset issued = asset(issuer.issued, symbol);
         asset limit = asset(issuer.issue_limit, symbol);
@@ -73,12 +73,12 @@ namespace waba {
             issuer.balance += quantity;
         });
 
-        if (to != current_sender()) {
-            SEND_INLINE_ACTION(*this, transfer, { current_sender(), N(active) },
-                               { current_sender(), to, quantity, memo });
+        if (to != from) {
+            SEND_INLINE_ACTION(*this, transfer, { from, N(active) },
+                               { from, to, quantity, memo });
         }
 
-        token_contract.issue(to, quantity, settings);
+        token_contract.issue(from, to, quantity, settings);
 
     }
 

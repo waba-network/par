@@ -26,6 +26,8 @@ include(wasm)
 
 add_executable(eosio-s2wasm IMPORTED)
 set_property(TARGET eosio-s2wasm PROPERTY IMPORTED_LOCATION "${EOS_HOME}/build/externals/binaryen/bin/eosio-s2wasm")
+add_executable(eosio-wast2wasm IMPORTED)
+set_property(TARGET eosio-wast2wasm PROPERTY IMPORTED_LOCATION "${EOS_HOME}/build/libraries/wasm-jit/Source/Programs/eosio-wast2wasm")
 add_library(eosiolib IMPORTED STATIC GLOBAL)
 set_property(TARGET eosiolib PROPERTY IMPORTED_LOCATION "${EOS_HOME}/build/contracts/eosiolib/eosiolib.bc")
 add_library(libc++ IMPORTED STATIC GLOBAL)

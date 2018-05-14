@@ -46,7 +46,7 @@ namespace waba {
                                 eosio::symbol_type symbol,
                                 std::vector<setting> contract_settings) const = 0;
 
-        virtual void issue(account_name to, asset quantity, std::vector<setting> settings) const = 0;
+        virtual void issue(account_name from, account_name to, asset quantity, std::vector<setting> settings) const = 0;
 
     };
 

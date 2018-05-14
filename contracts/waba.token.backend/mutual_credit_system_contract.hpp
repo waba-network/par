@@ -40,7 +40,7 @@ namespace waba {
                        eosio::symbol_type symbol,
                        std::vector<setting> contract_settings) const override;
 
-        void issue(account_name to, asset quantity, std::vector<setting> settings) const override;
+        void issue(account_name from, account_name to, asset quantity, std::vector<setting> settings) const override;
 
     };
 }/// namespace eosio

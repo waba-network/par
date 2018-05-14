@@ -31,9 +31,9 @@ namespace waba {
         // default impl is good enough for us
     }
 
-    void mutual_credit_system_contract::issue(account_name to, asset quantity, std::vector<setting> settings) const {
+    void mutual_credit_system_contract::issue(account_name from, account_name to, asset quantity, std::vector<setting> settings) const {
         symbol_type symbol = quantity.symbol;
-        accounts_table issuer_accounts(_self, current_sender());
+        accounts_table issuer_accounts(_self, from);
         issuer_accounts.modify(issuer_accounts.get(symbol), 0, [&](auto &to_update) {
             to_update.overdraft = (asset(to_update.overdraft, symbol) + quantity).amount;
         });
