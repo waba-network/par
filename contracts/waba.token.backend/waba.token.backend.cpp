@@ -54,6 +54,8 @@ namespace waba {
         token_settings_table token_settings_table(_self, symbol);
         const token_settings &token_settings = token_settings_table.get(symbol);
 
+        require_auth(from);
+
         accounts_table issuer_accounts(_self, from);
         const account& issuer = issuer_accounts.get(symbol);
         asset issued = asset(issuer.issued, symbol);
