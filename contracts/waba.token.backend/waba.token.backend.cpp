@@ -148,15 +148,33 @@ namespace waba {
         accounts_table to_acnts(_self, owner);
         auto to = to_acnts.find(value.symbol.name());
         if (to == to_acnts.end()) {
-            to_acnts.emplace(ram_payer, [&](auto &a) {
-                a.balance = value;
-                a.referrer = referrer;
-            });
+            SEND_INLINE_ACTION(*this, createacct, { ram_payer, N(active) },
+                               { owner, value.symbol, ram_payer, referrer });
+            this->add_balance(owner, value, st, ram_payer, referrer);
         } else {
             to_acnts.modify(to, 0, [&](auto &a) {
                 a.balance += value;
             });
         }
+    }
+
+    void token::createacct(account_name owner, symbol_type symbol, account_name ram_payer, account_name referrer) {
+        accounts_table to_acnts(_self, owner);
+
+        // this is just for validating that the symbol does actually exist.
+        token_settings_table token_settings_table(_self, symbol.name());
+        const auto &token_settings = token_settings_table.get(symbol.name());
+
+        auto to = to_acnts.find(symbol.name());
+        if (to == to_acnts.end()) {
+            to_acnts.emplace(ram_payer, [&](auto &a) {
+                a.balance = asset(0, symbol.name());
+                a.referrer = referrer;
+            });
+        } else {
+            eosio_assert(false, "account already exists");
+        }
+
     }
 
     const token_contract& token::get_contract(contract_type type) {
@@ -175,4 +193,4 @@ namespace waba {
 
 } /// namespace eosio
 
-EOSIO_ABI(waba::token, (create)(issue)(setissuelimit)(transfer))
+EOSIO_ABI(waba::token, (create)(issue)(setissuelimit)(transfer)(createacct))

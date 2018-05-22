@@ -44,6 +44,11 @@ namespace waba {
                       asset quantity,
                       string memo);
 
+        void createacct(account_name owner,
+                      symbol_type symbol,
+                      account_name ram_payer,
+                      account_name referrer);
+
     private:
 
         inline asset get_supply(symbol_name sym) const;
