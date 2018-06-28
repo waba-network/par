@@ -1,5 +1,3 @@
-#pragma once
-
 #include <vector>
 #include "mutual_credit_system_contract.hpp"
 
